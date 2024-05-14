@@ -13,7 +13,7 @@ pipeline {
             steps {
                 echo 'Building the Irssi Image'
                 //Usun poprzedni image
-                sh 'docker rmi -f irssi-builder'
+                //sh 'docker rmi -f irssi-builder'
                 dir('irssi/Building'){
                     sh 'docker build -t irssi-builder .'
                 }
@@ -23,6 +23,7 @@ pipeline {
             steps {
                 echo 'Testing'
                 dir('irssi/Testing'){
+                    sh 'docker rmi -f irssi-tester'
                     sh 'docker build -t irssi-tester .'
                 }
             }
