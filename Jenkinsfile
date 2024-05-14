@@ -23,7 +23,7 @@ pipeline {
             steps {
                 echo 'Testing'
                 dir('irssi/Dockerfiles'){
-                    sh 'docker build -f irssi-tstr.Dockerfile .'
+                    sh 'docker build -f irssi-test.Dockerfile .'
                 }
             }
         }
