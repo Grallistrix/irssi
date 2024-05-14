@@ -1,5 +1,30 @@
-FROM danger89/cmake:latest
+FROM irssi-publisher AS build-on-deploy
 
-COPY ./artifacts/ .
+RUN apt -y install cmake openssl-devel
 
-CMD ninja -C ./build
+WORKDIR /source_rpm
+
+RUN rpmbuild --rebuild --nodebuginfo irssi-1-1.src.rpm
+    
+RUN apt -y install /root/rpmbuild/RPMS/x86_64/irssi-1-1.x86_64.rpm
+
+
+
+
+
+
+FROM ubuntu AS deploy 
+
+RUN mkdir -p /rpm
+RUN mkdir -p /source_rpm
+
+COPY --from=build-on-deploy /source_rpm /source_rpm
+COPY --from=build-on-deploy /root/rpmbuild/RPMS/x86_64/irssi-1-1.x86_64.rpm /rpm/
+
+RUN apt -y install glib2-devel perl ncurses-libs utf8proc openssl-devel
+RUN apt clean all
+RUN apt -y install /rpm/irssi-1-1.x86_64.rpm
+
+ENTRYPOINT irssi
+
+CMD ["--version"]

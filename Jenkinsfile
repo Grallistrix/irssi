@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     stages {
-        stage('Prepare') {
+        stage('Clone') {
             steps {
+                //Usuń poprzednie repo
                 sh 'rm -rf irssi'
                 sh 'git clone https://github.com/Grallistrix/irssi'
             }
@@ -14,7 +15,7 @@ pipeline {
                 //Usun poprzedni image
                 sh 'docker rmi -f irssi-builder'
                 dir('irssi/Building'){
-                    st 'docker build -t irssi-builder .'
+                    sh 'docker build -t irssi-builder .'
                 }
             }
         }
