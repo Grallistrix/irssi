@@ -9,9 +9,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'docker images'
                 sh 'docker rmi -f irssi-builder'
-                sh 'docker images'
                 dir('irssi/Dockerfiles'){
                     sh 'docker build -t irssi-builder -f irssi-builder.Dockerfile .'
                 }
