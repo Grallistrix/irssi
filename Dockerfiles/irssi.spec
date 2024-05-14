@@ -50,3 +50,7 @@ cp %{_builddir}/irssi/COPYING %{buildroot}/usr/local/share/licenses/%{name}/
 /usr/local/include/
 /usr/local/lib64/
 /usr/local/bin/openssl
+
+%changelog
+* Tue May 14 2024 Andrzej Piotrowski <apiotrow@student.agh.edu.pl> - 1-1
+- 1 version 1 release
