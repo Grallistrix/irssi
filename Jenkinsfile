@@ -1,48 +1,76 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+    }
+
     stages {
-        stage('Prepare') {
+        stage('Pull') {
             steps {
-                sh 'rm -rf irssi'
-                sh 'git clone https://github.com/Grallistrix/irssi.git'
-            }
-        }
-        stage('Build') {
-            steps {
-                sh 'docker rmi -f irssi-builder'
-                dir('irssi/Dockerfiles'){
-                    sh 'docker build -t irssi-builder -f irssi-builder.Dockerfile .'
-                }
-            }
-        }
-        stage('Test') {
-            steps {
-                dir('irssi/Dockerfiles'){
-                    sh 'docker build -f irssi-test.Dockerfile .'
-                }
-            }
-        }
-        stage('Publish') {
-            steps {
-                dir('irssi/Dockerfiles'){
-                    echo 'RPM'
-                    sh 'docker build -t irssi-publisher -f irssi-publish.Dockerfile .'
-                }
-            }
-        }
-        stage('Deploy') {
-            steps {
-                dir('irssi/Dockerfiles'){
-                    sh "docker stop irssi-1"
-                    sh "docker rm -f irssi-1"
-                    sh 'docker build -t irssi-deployer -f irssi-deploy.Dockerfile .'
-                    sh "docker run -it -d --name irssi-1 irssi-deployer"
-                    sh "docker exec irssi-1 irssi --version"
-                    sh "docker logs irssi-1"
-                }
+                echo "Pullowanie repo"
+                git branch: 'master', credentialsId: 'bfd3d51b-874c-4e9b-b867-26d457d62113', url: 'https://github.com/krezler21/irssi'
             }
         }
         
+        stage('Build') {
+            steps {
+                echo "Budowa projektu"
+                sh '''
+                    docker build -t irssi-build:latest -f ./Dockerfiles/irssi-builder.Dockerfile .
+                    docker run --name build_container irssi-build:latest
+                    docker cp build_container:/irssi/build ./artifacts
+                    docker logs build_container > ./artifacts/log_build.txt
+                '''
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                echo "Testowanie projektu"
+                sh '''
+                    docker build -t irssi-test:latest -f ./Dockerfiles/irssi-test.Dockerfile .
+                    docker run --name test_container irssi-test:latest
+                    docker logs test_container > ./artifacts/log_test.txt
+                '''
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploy projektu"
+                sh '''
+                docker build -t irssi-deploy:latest -f ./Dockefiles/irssi-deploy.Dockerfile .
+                docker run -p 3000:3000 -d --rm --name deploy_container irssi-deploy:latest
+                '''
+            }
+        }
+
+        stage('Publish') {
+            steps {
+                echo "Publikacja projektu"
+                sh '''
+                TIMESTAMP=$(date +%Y%m%d%H%M%S)
+                tar -czf artifact_$TIMESTAMP.tar.gz artifacts
+                echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                NUMBER='''+ env.BUILD_NUMBER +'''
+                docker tag irssi-deploy:latest krezler21/irssi_fork:latest
+                docker push krezler21/irssi_fork:latest
+                docker logout
+                '''
+            } 
+        }
+
     }
+
+     post{
+        always{
+            archiveArtifacts artifacts: 'artifact_*.tar.gz', fingerprint: true
+            sh '''
+            chmod +x czyszczenie.sh
+            ./czyszczenie.sh
+            '''
+        }
+
+     }
 }
