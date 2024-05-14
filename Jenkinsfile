@@ -5,6 +5,7 @@ pipeline {
         stage('Prepare') {
             steps {
                 sh 'rm -rf irssi'
+                sh 'git clone https://github.com/Grallistrix/irssi.git'
             }
         }
         stage('Build') {
