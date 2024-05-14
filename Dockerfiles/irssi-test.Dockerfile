@@ -1,5 +1,5 @@
-FROM irssi-builder
+FROM danger89/cmake:latest
 
-WORKDIR /irssi/Build
+COPY ./artifacts/ .
 
-RUN ninja test
+CMD ninja -C ./build
