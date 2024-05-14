@@ -5,14 +5,8 @@ RUN dnf -y install cmake openssl-devel
 WORKDIR /source_rpm
 
 RUN rpmbuild --rebuild --nodebuginfo irssi-1-1.src.rpm
-    
 RUN dnf -y install /root/rpmbuild/RPMS/x86_64/irssi-1-1.x86_64.rpm
-
-
-
-
-
-
+#---------------------------------------------------------------------
 FROM fedora:39 AS deploy 
 
 RUN mkdir -p /rpm
