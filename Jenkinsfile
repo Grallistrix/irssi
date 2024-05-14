@@ -10,7 +10,6 @@ pipeline {
         }
         stage('Build') {
             steps {
-                echo 'Building'
                 sh 'docker images'
                 sh 'docker rmi -f irssi-builder'
                 sh 'docker images'
@@ -21,7 +20,6 @@ pipeline {
         }
         stage('Test') {
             steps {
-                echo 'Testing'
                 dir('irssi/Dockerfiles'){
                     sh 'docker build -f irssi-test.Dockerfile .'
                 }
@@ -29,7 +27,6 @@ pipeline {
         }
         stage('Publish') {
             steps {
-                echo 'Publishing'
                 dir('irssi/Dockerfiles'){
                     echo 'RPM'
                     sh 'docker build -t irssi-publisher -f irssi-publish.Dockerfile .'
@@ -38,7 +35,6 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                echo 'Deploying'
                 dir('irssi/Dockerfiles'){
                     sh "docker stop irssi-1"
                     sh "docker rm -f irssi-1"
