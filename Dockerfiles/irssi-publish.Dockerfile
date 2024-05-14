@@ -6,7 +6,7 @@ RUN tar -cvzf irssi.tar.gz irssi
 RUN cp irssi.tar.gz /root/rpmbuild/SOURCES/
 WORKDIR /root/rpmbuild/SPECS
 COPY ./irssi.spec .
-RUN rpmbuild -bs irssi.spec
+RUN rpmbuild -ba irssi.spec
 RUN rpmlint irssi.spec
 RUN rpmlint ../SRPMS/irssi-fc39.src.rpm
 RUN mkdir -p /source_rpm
