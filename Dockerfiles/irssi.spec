@@ -50,9 +50,3 @@ cp %{_builddir}/irssi/COPYING %{buildroot}/usr/local/share/licenses/%{name}/
 /usr/local/include/
 /usr/local/lib64/
 /usr/local/bin/openssl
-
-
-
-%changelog
-* Tue Apr 17 2024 Kapcer Papuga <kacperpap@gmail.com> - 1.0-1
-- The %{version} version and %{release} release
