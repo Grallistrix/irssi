@@ -1,5 +1,5 @@
-FROM irssi-builder:latest
+FROM irssi-builder
 
-WORKDIR /irssi
+WORKDIR /irssi/Building
 
 RUN ninja test

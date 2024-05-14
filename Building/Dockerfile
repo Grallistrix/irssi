@@ -1,11 +1,8 @@
-FROM ubuntu
-
-RUN apt update
-RUN apt -y install git meson ninja* libglib2.0-dev libutf8proc* ncurses-dev
-
-RUN git clone https://github.com/Grallistrix/irssi
+FROM fedora:39
+RUN dnf -y update
+RUN dnf -y install meson ninja* git gcc glib2-devel utf8proc* ncurses* perl-Ext*
 
 WORKDIR /irssi
 
-RUN meson build
-RUN ninja -C /irssi/build
+RUN meson Build
+RUN ninja -C /irssi/Building
